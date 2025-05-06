@@ -1,0 +1,336 @@
+// File: App.axaml.cs
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Markup.Xaml;
+using AvaloniaApplication.ViewModels;
+using AvaloniaApplication.Views;
+
+namespace AvaloniaApplication
+{
+    public partial class App : Application
+    {
+        public override void Initialize()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
+
+        public override void OnFrameworkInitializationCompleted()
+        {
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                desktop.MainWindow = new MainWindow
+                {
+                    DataContext = new MainWindowViewModel(),
+                };
+            }
+
+            base.OnFrameworkInitializationCompleted();
+        }
+    }
+}
+
+// File: MainWindow.axaml.cs
+using Avalonia.Controls;
+using Avalonia.ReactiveUI;
+using AvaloniaApplication.ViewModels;
+using ReactiveUI;
+
+namespace AvaloniaApplication.Views
+{
+    public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.WhenActivated(disposables => { });
+        }
+    }
+}
+
+// File: ViewModelBase.cs
+using ReactiveUI;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace AvaloniaApplication.ViewModels
+{
+    public class ViewModelBase : ReactiveObject
+    {
+    }
+}
+
+// File: MainWindowViewModel.cs
+using ReactiveUI;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Reactive;
+using System.Reactive.Linq;
+
+namespace AvaloniaApplication.ViewModels
+{
+    public class MainWindowViewModel : ViewModelBase
+    {
+        // Properties for main layout state
+        private bool _isSplitView;
+        public bool IsSplitView
+        {
+            get => _isSplitView;
+            set => this.RaiseAndSetIfChanged(ref _isSplitView, value);
+        }
+
+        private bool _isLeftSidebarVisible;
+        public bool IsLeftSidebarVisible
+        {
+            get => _isLeftSidebarVisible;
+            set => this.RaiseAndSetIfChanged(ref _isLeftSidebarVisible, value);
+        }
+
+        private bool _isRightSidebarVisible;
+        public bool IsRightSidebarVisible
+        {
+            get => _isRightSidebarVisible;
+            set => this.RaiseAndSetIfChanged(ref _isRightSidebarVisible, value);
+        }
+
+        // View models for different content types
+        private ViewModelBase _leftContentViewModel;
+        public ViewModelBase LeftContentViewModel
+        {
+            get => _leftContentViewModel;
+            set => this.RaiseAndSetIfChanged(ref _leftContentViewModel, value);
+        }
+
+        private ViewModelBase _rightContentViewModel;
+        public ViewModelBase RightContentViewModel
+        {
+            get => _rightContentViewModel;
+            set => this.RaiseAndSetIfChanged(ref _rightContentViewModel, value);
+        }
+
+        // Commands for menu actions
+        public ReactiveCommand<Unit, Unit> ToggleLeftSidebarCommand { get; }
+        public ReactiveCommand<Unit, Unit> ToggleRightSidebarCommand { get; }
+        public ReactiveCommand<Unit, Unit> ToggleSplitViewCommand { get; }
+        
+        // Commands for content type switching
+        public ReactiveCommand<Unit, Unit> ShowTextDocumentCommand { get; }
+        public ReactiveCommand<Unit, Unit> ShowSlideshowCommand { get; }
+        public ReactiveCommand<Unit, Unit> ShowWebReferenceCommand { get; }
+        public ReactiveCommand<Unit, Unit> ShowTestViewCommand { get; }
+
+        public MainWindowViewModel()
+        {
+            // Initialize sidebar visibility
+            IsLeftSidebarVisible = true;
+            IsRightSidebarVisible = false;
+            IsSplitView = false;
+
+            // Set default content
+            LeftContentViewModel = new TextDocumentViewModel();
+
+            // Initialize commands
+            ToggleLeftSidebarCommand = ReactiveCommand.Create(() => 
+                IsLeftSidebarVisible = !IsLeftSidebarVisible);
+            
+            ToggleRightSidebarCommand = ReactiveCommand.Create(() => 
+                IsRightSidebarVisible = !IsRightSidebarVisible);
+            
+            ToggleSplitViewCommand = ReactiveCommand.Create(() => 
+                IsSplitView = !IsSplitView);
+            
+            ShowTextDocumentCommand = ReactiveCommand.Create(() => 
+                LeftContentViewModel = new TextDocumentViewModel());
+            
+            ShowSlideshowCommand = ReactiveCommand.Create(() => 
+                LeftContentViewModel = new SlideshowViewModel());
+            
+            ShowWebReferenceCommand = ReactiveCommand.Create(() => 
+                LeftContentViewModel = new WebReferenceViewModel());
+            
+            ShowTestViewCommand = ReactiveCommand.Create(() => 
+                LeftContentViewModel = new TestViewModel());
+        }
+    }
+}
+
+// Content View Models
+
+// File: TextDocumentViewModel.cs
+namespace AvaloniaApplication.ViewModels
+{
+    public class TextDocumentViewModel : ViewModelBase
+    {
+        private string _documentText;
+        public string DocumentText
+        {
+            get => _documentText;
+            set => this.RaiseAndSetIfChanged(ref _documentText, value);
+        }
+
+        public TextDocumentViewModel()
+        {
+            DocumentText = "This is a text document.";
+        }
+    }
+}
+
+// File: SlideshowViewModel.cs
+using System.Collections.ObjectModel;
+using ReactiveUI;
+using System.Reactive;
+
+namespace AvaloniaApplication.ViewModels
+{
+    public class SlideshowViewModel : ViewModelBase
+    {
+        private ObservableCollection<SlideViewModel> _slides;
+        public ObservableCollection<SlideViewModel> Slides
+        {
+            get => _slides;
+            set => this.RaiseAndSetIfChanged(ref _slides, value);
+        }
+
+        private int _currentSlideIndex;
+        public int CurrentSlideIndex
+        {
+            get => _currentSlideIndex;
+            set => this.RaiseAndSetIfChanged(ref _currentSlideIndex, value);
+        }
+
+        public SlideViewModel CurrentSlide => Slides.Count > 0 ? Slides[CurrentSlideIndex] : null;
+
+        public ReactiveCommand<Unit, Unit> NextSlideCommand { get; }
+        public ReactiveCommand<Unit, Unit> PreviousSlideCommand { get; }
+
+        public SlideshowViewModel()
+        {
+            Slides = new ObservableCollection<SlideViewModel>
+            {
+                new SlideViewModel { Content = "Slide 1 Content" },
+                new SlideViewModel { Content = "Slide 2 Content" },
+                new SlideViewModel { Content = "Slide 3 Content" }
+            };
+
+            CurrentSlideIndex = 0;
+
+            NextSlideCommand = ReactiveCommand.Create(() =>
+            {
+                if (CurrentSlideIndex < Slides.Count - 1)
+                {
+                    CurrentSlideIndex++;
+                    this.RaisePropertyChanged(nameof(CurrentSlide));
+                }
+            });
+
+            PreviousSlideCommand = ReactiveCommand.Create(() =>
+            {
+                if (CurrentSlideIndex > 0)
+                {
+                    CurrentSlideIndex--;
+                    this.RaisePropertyChanged(nameof(CurrentSlide));
+                }
+            });
+        }
+    }
+
+    public class SlideViewModel : ViewModelBase
+    {
+        private string _content;
+        public string Content
+        {
+            get => _content;
+            set => this.RaiseAndSetIfChanged(ref _content, value);
+        }
+    }
+}
+
+// File: WebReferenceViewModel.cs
+namespace AvaloniaApplication.ViewModels
+{
+    public class WebReferenceViewModel : ViewModelBase
+    {
+        private string _url;
+        public string Url
+        {
+            get => _url;
+            set => this.RaiseAndSetIfChanged(ref _url, value);
+        }
+
+        public WebReferenceViewModel()
+        {
+            Url = "https://avaloniaui.net/";
+        }
+    }
+}
+
+// File: TestViewModel.cs
+using System.Collections.ObjectModel;
+using ReactiveUI;
+
+namespace AvaloniaApplication.ViewModels
+{
+    public class TestViewModel : ViewModelBase
+    {
+        private ObservableCollection<TestQuestionViewModel> _questions;
+        public ObservableCollection<TestQuestionViewModel> Questions
+        {
+            get => _questions;
+            set => this.RaiseAndSetIfChanged(ref _questions, value);
+        }
+
+        public TestViewModel()
+        {
+            Questions = new ObservableCollection<TestQuestionViewModel>
+            {
+                new TestQuestionViewModel
+                {
+                    QuestionText = "Sample test question 1?",
+                    Options = new ObservableCollection<string>
+                    {
+                        "Option A",
+                        "Option B",
+                        "Option C",
+                        "Option D"
+                    }
+                },
+                new TestQuestionViewModel
+                {
+                    QuestionText = "Sample test question 2?",
+                    Options = new ObservableCollection<string>
+                    {
+                        "Option A",
+                        "Option B",
+                        "Option C",
+                        "Option D"
+                    }
+                }
+            };
+        }
+    }
+
+    public class TestQuestionViewModel : ViewModelBase
+    {
+        private string _questionText;
+        public string QuestionText
+        {
+            get => _questionText;
+            set => this.RaiseAndSetIfChanged(ref _questionText, value);
+        }
+
+        private ObservableCollection<string> _options;
+        public ObservableCollection<string> Options
+        {
+            get => _options;
+            set => this.RaiseAndSetIfChanged(ref _options, value);
+        }
+
+        private int _selectedOptionIndex = -1;
+        public int SelectedOptionIndex
+        {
+            get => _selectedOptionIndex;
+            set => this.RaiseAndSetIfChanged(ref _selectedOptionIndex, value);
+        }
+    }
+}

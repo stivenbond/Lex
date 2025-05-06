@@ -1,0 +1,356 @@
+<!-- File: MainWindow.axaml -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AvaloniaApplication.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="using:AvaloniaApplication.Views"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        x:Class="AvaloniaApplication.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="AvaloniaApplication">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Main Menu -->
+        <Grid Grid.Row="0" Background="#2c3e50" ColumnDefinitions="Auto,*,Auto">
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <Button Content="≡" Command="{Binding ToggleLeftSidebarCommand}" Margin="5"/>
+                <Button Content="Text View" Command="{Binding ShowTextDocumentCommand}" Margin="5"/>
+                <Button Content="Slideshow" Command="{Binding ShowSlideshowCommand}" Margin="5"/>
+                <Button Content="Web" Command="{Binding ShowWebReferenceCommand}" Margin="5"/>
+                <Button Content="Test" Command="{Binding ShowTestViewCommand}" Margin="5"/>
+                <ToggleButton Content="Split View" IsChecked="{Binding IsSplitView}" Margin="5"/>
+            </StackPanel>
+            
+            <TextBlock Grid.Column="1" Text="Avalonia UI with ReactiveUI Demo" 
+                       HorizontalAlignment="Center" VerticalAlignment="Center" 
+                       Foreground="White" FontWeight="Bold"/>
+            
+            <Button Grid.Column="2" Content="≡" Command="{Binding ToggleRightSidebarCommand}" Margin="5"/>
+        </Grid>
+        
+        <!-- Main Content -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Left Sidebar -->
+            <Border Grid.Column="0" Width="200" IsVisible="{Binding IsLeftSidebarVisible}" 
+                    Background="#ecf0f1" BorderBrush="#bdc3c7" BorderThickness="0,0,1,0">
+                <StackPanel Margin="5">
+                    <TextBlock Text="Classes" FontWeight="Bold" Margin="5"/>
+                    <ListBox>
+                        <ListBoxItem>Class 1</ListBoxItem>
+                        <ListBoxItem>Class 2</ListBoxItem>
+                        <ListBoxItem>Class 3</ListBoxItem>
+                    </ListBox>
+                    
+                    <TextBlock Text="Books" FontWeight="Bold" Margin="5,15,5,5"/>
+                    <ListBox>
+                        <ListBoxItem>Book 1</ListBoxItem>
+                        <ListBoxItem>Book 2</ListBoxItem>
+                        <ListBoxItem>Book 3</ListBoxItem>
+                    </ListBox>
+                </StackPanel>
+            </Border>
+            
+            <!-- Content Container -->
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*" IsVisible="{Binding IsSplitView}"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Left Content -->
+                <ContentControl Grid.Column="0" Content="{Binding LeftContentViewModel}">
+                    <ContentControl.DataTemplates>
+                        <DataTemplate DataType="{x:Type vm:TextDocumentViewModel}">
+                            <views:TextDocumentView/>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type vm:SlideshowViewModel}">
+                            <views:SlideshowView/>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type vm:WebReferenceViewModel}">
+                            <views:WebReferenceView/>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type vm:TestViewModel}">
+                            <views:TestView/>
+                        </DataTemplate>
+                    </ContentControl.DataTemplates>
+                </ContentControl>
+                
+                <!-- Right Content (only visible in split view) -->
+                <ContentControl Grid.Column="1" Content="{Binding RightContentViewModel}" IsVisible="{Binding IsSplitView}">
+                    <ContentControl.DataTemplates>
+                        <DataTemplate DataType="{x:Type vm:TextDocumentViewModel}">
+                            <views:TextDocumentView/>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type vm:SlideshowViewModel}">
+                            <views:SlideshowView/>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type vm:WebReferenceViewModel}">
+                            <views:WebReferenceView/>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type vm:TestViewModel}">
+                            <views:TestView/>
+                        </DataTemplate>
+                    </ContentControl.DataTemplates>
+                </ContentControl>
+            </Grid>
+            
+            <!-- Right Sidebar -->
+            <Border Grid.Column="2" Width="200" IsVisible="{Binding IsRightSidebarVisible}" 
+                    Background="#ecf0f1" BorderBrush="#bdc3c7" BorderThickness="1,0,0,0">
+                <StackPanel Margin="5">
+                    <TextBlock Text="Resources" FontWeight="Bold" Margin="5"/>
+                    <ListBox>
+                        <ListBoxItem>Resource 1</ListBoxItem>
+                        <ListBoxItem>Resource 2</ListBoxItem>
+                        <ListBoxItem>Resource 3</ListBoxItem>
+                    </ListBox>
+                    
+                    <TextBlock Text="Tests" FontWeight="Bold" Margin="5,15,5,5"/>
+                    <ListBox>
+                        <ListBoxItem>Test 1</ListBoxItem>
+                        <ListBoxItem>Test 2</ListBoxItem>
+                        <ListBoxItem>Test 3</ListBoxItem>
+                    </ListBox>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
+
+<!-- File: TextDocumentView.axaml -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:AvaloniaApplication.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="AvaloniaApplication.Views.TextDocumentView"
+             x:DataType="vm:TextDocumentViewModel">
+    <Grid RowDefinitions="Auto,*">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Background="#3498db" Padding="10">
+            <TextBlock Text="Text Document View" Foreground="White" FontWeight="Bold"/>
+        </StackPanel>
+        
+        <Grid Grid.Row="1" Margin="10">
+            <TextBox Text="{Binding DocumentText}" AcceptsReturn="True" TextWrapping="Wrap"/>
+        </Grid>
+    </Grid>
+</UserControl>
+
+<!-- File: SlideshowView.axaml -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:AvaloniaApplication.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="AvaloniaApplication.Views.SlideshowView"
+             x:DataType="vm:SlideshowViewModel">
+    <Grid RowDefinitions="Auto,*,Auto">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Background="#e74c3c" Padding="10">
+            <TextBlock Text="Slideshow View" Foreground="White" FontWeight="Bold"/>
+        </StackPanel>
+        
+        <Border Grid.Row="1" Margin="20" BorderBrush="Gray" BorderThickness="1">
+            <TextBlock Text="{Binding CurrentSlide.Content}" 
+                       HorizontalAlignment="Center" 
+                       VerticalAlignment="Center"
+                       FontSize="24"/>
+        </Border>
+        
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+            <Button Content="Previous" Command="{Binding PreviousSlideCommand}" Margin="5"/>
+            <TextBlock Text="{Binding CurrentSlideIndex}" VerticalAlignment="Center" Margin="10,0"/>
+            <Button Content="Next" Command="{Binding NextSlideCommand}" Margin="5"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
+
+<!-- File: WebReferenceView.axaml -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:AvaloniaApplication.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="AvaloniaApplication.Views.WebReferenceView"
+             x:DataType="vm:WebReferenceViewModel">
+    <Grid RowDefinitions="Auto,Auto,*">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Background="#9b59b6" Padding="10">
+            <TextBlock Text="Web Reference View" Foreground="White" FontWeight="Bold"/>
+        </StackPanel>
+        
+        <Grid Grid.Row="1" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Text="{Binding Url}" Watermark="Enter URL..."/>
+            <Button Grid.Column="1" Content="Go" Margin="5,0,0,0"/>
+        </Grid>
+        
+        <Border Grid.Row="2" Margin="10" BorderBrush="Gray" BorderThickness="1">
+            <TextBlock Text="Web content would be displayed here. 
+                       Avalonia doesn't include a WebView control by default,
+                       but you can add WebViewControl from the Avalonia.WebView package."
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     TextWrapping="Wrap"
+                     Margin="20"/>
+        </Border>
+    </Grid>
+</UserControl>
+
+<!-- File: TestView.axaml -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:AvaloniaApplication.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="AvaloniaApplication.Views.TestView"
+             x:DataType="vm:TestViewModel">
+    <Grid RowDefinitions="Auto,*">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Background="#2ecc71" Padding="10">
+            <TextBlock Text="Test View" Foreground="White" FontWeight="Bold"/>
+        </StackPanel>
+        
+        <ScrollViewer Grid.Row="1" Margin="10">
+            <ItemsControl Items="{Binding Questions}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="LightGray" BorderThickness="1" Margin="0,5" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="{Binding QuestionText}" FontWeight="Bold" Margin="0,0,0,10"/>
+                                <ItemsControl Items="{Binding Options}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <RadioButton Content="{Binding}" Margin="0,5"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
+
+<!-- File: App.axaml -->
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AvaloniaApplication.App">
+    <Application.Styles>
+        <FluentTheme Mode="Light"/>
+    </Application.Styles>
+</Application>
+
+<!-- File: TextDocumentView.axaml.cs -->
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
+using Avalonia.ReactiveUI;
+using AvaloniaApplication.ViewModels;
+using ReactiveUI;
+
+namespace AvaloniaApplication.Views
+{
+    public partial class TextDocumentView : ReactiveUserControl<TextDocumentViewModel>
+    {
+        public TextDocumentView()
+        {
+            InitializeComponent();
+            this.WhenActivated(disposables => { });
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
+    }
+}
+
+<!-- File: SlideshowView.axaml.cs -->
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
+using Avalonia.ReactiveUI;
+using AvaloniaApplication.ViewModels;
+using ReactiveUI;
+
+namespace AvaloniaApplication.Views
+{
+    public partial class SlideshowView : ReactiveUserControl<SlideshowViewModel>
+    {
+        public SlideshowView()
+        {
+            InitializeComponent();
+            this.WhenActivated(disposables => { });
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
+    }
+}
+
+<!-- File: WebReferenceView.axaml.cs -->
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
+using Avalonia.ReactiveUI;
+using AvaloniaApplication.ViewModels;
+using ReactiveUI;
+
+namespace AvaloniaApplication.Views
+{
+    public partial class WebReferenceView : ReactiveUserControl<WebReferenceViewModel>
+    {
+        public WebReferenceView()
+        {
+            InitializeComponent();
+            this.WhenActivated(disposables => { });
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
+    }
+}
+
+<!-- File: TestView.axaml.cs -->
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
+using Avalonia.ReactiveUI;
+using AvaloniaApplication.ViewModels;
+using ReactiveUI;
+
+namespace AvaloniaApplication.Views
+{
+    public partial class TestView : ReactiveUserControl<TestViewModel>
+    {
+        public TestView()
+        {
+            InitializeComponent();
+            this.WhenActivated(disposables => { });
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
+    }
+}

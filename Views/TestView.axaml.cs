@@ -1,16 +1,22 @@
 using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 using Lex.ViewModels;
 using ReactiveUI;
 
 namespace Lex.Views
 {
-    public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
+    public partial class TestView : ReactiveUserControl<TestViewModel>
     {
-        public MainWindow()
+        public TestView()
         {
             InitializeComponent();
             this.WhenActivated(disposables => { });
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
         }
     }
 }

@@ -3,18 +3,127 @@
         xmlns:vm="using:Lex.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:views="using:Lex.Views"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
         x:Class="Lex.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Lex">
+        Title="AvaloniaApplication">
 
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-
+    <Grid RowDefinitions="Auto,*">
+        <!-- Main Menu -->
+        <Grid Grid.Row="0" Background="#2c3e50" ColumnDefinitions="Auto,*,Auto">
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <Button Content="≡" Command="{Binding ToggleLeftSidebarCommand}" Margin="5"/>
+                <Button Content="Text View" Command="{Binding ShowTextDocumentCommand}" Margin="5"/>
+                <Button Content="Slideshow" Command="{Binding ShowSlideshowCommand}" Margin="5"/>
+                <Button Content="Web" Command="{Binding ShowWebReferenceCommand}" Margin="5"/>
+                <Button Content="Test" Command="{Binding ShowTestViewCommand}" Margin="5"/>
+                <ToggleButton Content="Split View" IsChecked="{Binding IsSplitView}" Margin="5"/>
+            </StackPanel>
+            
+            <TextBlock Grid.Column="1" Text="Avalonia UI with ReactiveUI Demo" 
+                       HorizontalAlignment="Center" VerticalAlignment="Center" 
+                       Foreground="White" FontWeight="Bold"/>
+            
+            <Button Grid.Column="2" Content="≡" Command="{Binding ToggleRightSidebarCommand}" Margin="5"/>
+        </Grid>
+        
+        <!-- Main Content -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Left Sidebar -->
+            <Border Grid.Column="0" Width="200" IsVisible="{Binding IsLeftSidebarVisible}" 
+                    Background="#ecf0f1" BorderBrush="#bdc3c7" BorderThickness="0,0,1,0">
+                <StackPanel Margin="5">
+                    <TextBlock Text="Classes" FontWeight="Bold" Margin="5"/>
+                    <ListBox>
+                        <ListBoxItem>Class 1</ListBoxItem>
+                        <ListBoxItem>Class 2</ListBoxItem>
+                        <ListBoxItem>Class 3</ListBoxItem>
+                    </ListBox>
+                    
+                    <TextBlock Text="Books" FontWeight="Bold" Margin="5,15,5,5"/>
+                    <ListBox>
+                        <ListBoxItem>Book 1</ListBoxItem>
+                        <ListBoxItem>Book 2</ListBoxItem>
+                        <ListBoxItem>Book 3</ListBoxItem>
+                    </ListBox>
+                </StackPanel>
+            </Border>
+            
+            <!-- Content Container -->
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*" Visual.IsVisible="{Binding IsSplitView}"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Left Content -->
+                <ContentControl Grid.Column="0" Content="{Binding LeftContentViewModel}">
+                    <ContentControl.DataTemplates>
+                        <DataTemplate DataType="{x:Type vm:TextDocumentViewModel}">
+                            <views:TextDocumentView/>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type vm:SlideshowViewModel}">
+                            <views:SlideshowView/>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type vm:WebReferenceViewModel}">
+                            <views:WebReferenceView/>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type vm:TestViewModel}">
+                            <views:TestView/>
+                        </DataTemplate>
+                    </ContentControl.DataTemplates>
+                </ContentControl>
+                
+                <!-- Right Content (only visible in split view) -->
+                <ContentControl Grid.Column="1" Content="{Binding RightContentViewModel}" IsVisible="{Binding IsSplitView}">
+                    <ContentControl.DataTemplates>
+                        <DataTemplate DataType="{x:Type vm:TextDocumentViewModel}">
+                            <views:TextDocumentView/>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type vm:SlideshowViewModel}">
+                            <views:SlideshowView/>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type vm:WebReferenceViewModel}">
+                            <views:WebReferenceView/>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type vm:TestViewModel}">
+                            <views:TestView/>
+                        </DataTemplate>
+                    </ContentControl.DataTemplates>
+                </ContentControl>
+            </Grid>
+            
+            <!-- Right Sidebar -->
+            <Border Grid.Column="2" Width="200" IsVisible="{Binding IsRightSidebarVisible}" 
+                    Background="#ecf0f1" BorderBrush="#bdc3c7" BorderThickness="1,0,0,0">
+                <StackPanel Margin="5">
+                    <TextBlock Text="Resources" FontWeight="Bold" Margin="5"/>
+                    <ListBox>
+                        <ListBoxItem>Resource 1</ListBoxItem>
+                        <ListBoxItem>Resource 2</ListBoxItem>
+                        <ListBoxItem>Resource 3</ListBoxItem>
+                    </ListBox>
+                    
+                    <TextBlock Text="Tests" FontWeight="Bold" Margin="5,15,5,5"/>
+                    <ListBox>
+                        <ListBoxItem>Test 1</ListBoxItem>
+                        <ListBoxItem>Test 2</ListBoxItem>
+                        <ListBoxItem>Test 3</ListBoxItem>
+                    </ListBox>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
 </Window>

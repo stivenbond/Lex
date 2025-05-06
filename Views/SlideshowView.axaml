@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:Lex.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Lex.Views.SlideshowView"
+             x:DataType="vm:SlideshowViewModel">
+    <Grid RowDefinitions="Auto,*,Auto">
+        <Border Grid.Row="0" Background="#e74c3c" Padding="10">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Slideshow View" Foreground="White" FontWeight="Bold"/>
+            </StackPanel>
+        </Border>
+        
+        <Border Grid.Row="1" Margin="20" BorderBrush="Gray" BorderThickness="1">
+            <TextBlock Text="{Binding CurrentSlide.Content}" 
+                       HorizontalAlignment="Center" 
+                       VerticalAlignment="Center"
+                       FontSize="24"/>
+        </Border>
+        
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+            <Button Content="Previous" Command="{Binding PreviousSlideCommand}" Margin="5"/>
+            <TextBlock Text="{Binding CurrentSlideIndex}" VerticalAlignment="Center" Margin="10,0"/>
+            <Button Content="Next" Command="{Binding NextSlideCommand}" Margin="5"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

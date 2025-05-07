@@ -1,6 +1,17 @@
-﻿namespace Lex.ViewModels;
+using Lex.Data;
+using Lex.Data.Repositories;
+using SQLitePCL;
 
-public partial class MainWindowViewModel : ViewModelBase
+namespace Lex.ViewModels;
+
+public class MainWindowViewModel()
 {
-    public string Greeting { get; } = "Welcome to Avalonia!";
+    public required LeftSidebarViewModel LeftSidebarViewModel { get; set; }
+
+    public MainWindowViewModel(LeftSidebarViewModel leftSidebarViewModel) : this()
+    {
+        LeftSidebarViewModel = leftSidebarViewModel;
+    }
+
+
 }
